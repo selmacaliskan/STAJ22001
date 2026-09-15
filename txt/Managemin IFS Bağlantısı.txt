@@ -1,0 +1,15 @@
+SELECT 
+    a.ORDER_NO ORDER_NO,
+    a.ORDER_NO ORDERNO,
+    ifsapp.customer_info_api.Get_Name(ifsapp.customer_order_api.Get_Customer_No(a.ORDER_NO)) MUSTERI,
+    a.PART_NO,
+    a.CATALOG_DESC,
+to_char(a.planned_ship_date, 'IW') SIPARIS_TESLIM_HAFTASI
+FROM ifsapp.customer_order_line a
+WHERE a.OBJSTATE <> 'Cancelled'
+  AND (
+      a.ORDER_NO LIKE (TO_CHAR(SYSDATE, 'YY') || 'M%')
+      OR 
+      a.ORDER_NO LIKE (TO_CHAR(ADD_MONTHS(SYSDATE, -12), 'YY') || 'M%')
+  )
+ORDER BY 1

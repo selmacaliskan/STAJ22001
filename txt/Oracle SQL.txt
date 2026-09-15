@@ -1,0 +1,19 @@
+select sq.quotation_no TEKLIF_NO,
+       sq.quotation_desc TEKLIF_ACIKLAMA,
+       (select max(wsq.wo_no) from WO_SRV_QUO_UIV WSQ where wsq.quotation_no=sq.quotation_no) BAKIM_EMRI_NUMARASI,
+       (select max(wsq.org_code) from WO_SRV_QUO_UIV WSQ where wsq.quotation_no=sq.quotation_no) BAKIM_ORGANIZASYONU,
+       work_type_api.Get_Description(
+       (select max(jt.work_type_id) from JT_TASK_SRV_QUO_UIV JT where JT.quotation_no=sq.quotation_no)) BAKIM_TURU,
+       sq.customer_id MUSTERI_NO,
+       customer_info_api.Get_Name(sq.customer_id) MUSTERI_ADI,
+       customer_info_api.Get_Country(sq.customer_id) ULKE_KODU,
+       sq.coordinator,
+       person_info_api.Get_Name(sq.coordinator) coordinator_Adi,
+       sq.state,
+       sq.currency_code Doviz_kodu,     
+       trunc(sq.req_receipt_date) Teklif_Tarihi
+  from SERVICE_QUOTATION_UIV SQ
+ where sq.objstate in ('Cancelled', 'Rejected', 'Accepted')
+       and sq.dt_cre between to_date('&BAS_TARIH', 'DD.MM.YYYY') and
+       to_date('&BIT_TARIH', 'DD.MM.YYYY')
+       order by sq.dt_cre

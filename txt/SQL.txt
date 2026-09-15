@@ -1,0 +1,5 @@
+select ht.IsTanimi,ht.VerilisTarihi,ht.GerceklesenBitisTarihi,ce.Name as Gorev_Giris_tipi,PP.FullName 'Tam Adı'
+from HaftalikIsTakibi ht
+join ClassEnum ce on ce.OID=ht.GorevGirisTipi
+join PermissionPolicyUser PP on PP.Oid=ht.Gorevli
+where GerceklesenBitisTarihi is not null
