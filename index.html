@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CNC Machine V1 — Baykal Makine Kayıt Paneli</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ============ TOP BAR ============ -->
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-icon">⚙️</span>
+    <span class="brand-text">CNC MACHINE V1</span>
+  </div>
+  <div class="topbar-pills">
+    <div class="pill">
+      <span class="pill-label">Panel</span>
+      <span class="pill-value">İzleme &amp; Kayıt</span>
+    </div>
+    <div class="pill">
+      <span class="pill-label">Sunucu</span>
+      <span class="pill-value" id="connStatus">● kontrol ediliyor</span>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar">
+    <nav class="nav">
+      <button class="nav-item active" data-view="view">
+        <span class="nav-icon">📊</span><span class="nav-text">View</span>
+      </button>
+      <button class="nav-item" data-view="program">
+        <span class="nav-icon">📋</span><span class="nav-text">Program</span>
+      </button>
+      <button class="nav-item" data-view="manuel">
+        <span class="nav-icon">🔧</span><span class="nav-text">Manuel</span>
+      </button>
+      <button class="nav-item" data-view="hatalar">
+        <span class="nav-icon">⚠️</span><span class="nav-text">Hatalar</span>
+      </button>
+      <button class="nav-item" data-view="kullanicilar">
+        <span class="nav-icon">👤</span><span class="nav-text">Kullanıcılar</span>
+      </button>
+      <button class="nav-item" data-view="settings">
+        <span class="nav-icon">⚙️</span><span class="nav-text">Settings</span>
+      </button>
+    </nav>
+  </aside>
+
+  <!-- ============ MAIN CONTENT ============ -->
+  <main class="content">
+
+    <!-- ---------- VIEW ---------- -->
+    <section class="view-panel" id="panel-view">
+      <h1 class="page-title">Makine Genel Durumu</h1>
+
+      <div class="stat-grid">
+
+        <div class="card">
+          <h2 class="card-title">Toplam Çalıştırma Sayısı</h2>
+          <div class="gauge-wrap">
+            <svg class="gauge" viewBox="0 0 200 200">
+              <circle class="gauge-track" cx="100" cy="100" r="82"></circle>
+              <circle class="gauge-fill" id="gaugeFill" cx="100" cy="100" r="82"></circle>
+            </svg>
+            <div class="gauge-center">
+              <span class="gauge-number" id="runCount">0</span>
+              <span class="gauge-label">ÇALIŞTIRMA</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card status-card">
+          <div class="status-row">
+            <span class="field-label">Makine Durumu</span>
+            <span class="machine-status" id="machineStatus">
+              <span class="dot"></span> —
+            </span>
+          </div>
+          <div class="status-row">
+            <span class="field-label">Toplam İşlenen Mesafe</span>
+            <span class="big-value" id="totalDistance">0.00 mm</span>
+          </div>
+        </div>
+
+      </div>
+
+      <h2 class="section-title">Son İşlem Kayıtları (machine_logs)</h2>
+
+      <div class="table-wrap">
+        <table class="logs-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Operatör</th>
+              <th>İşlem</th>
+              <th>İşlenen (mm)</th>
+              <th>Süre (sn)</th>
+              <th>Durum</th>
+              <th>Başlangıç</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="logsBody">
+            <tr><td colspan="8" class="empty">Yükleniyor…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ---------- PROGRAM ---------- -->
+    <section class="view-panel hidden" id="panel-program">
+      <h1 class="page-title">Program</h1>
+      <div class="card">
+        <h2 class="card-title">Tanımlı Operasyonlar</h2>
+        <div class="table-wrap">
+          <table class="logs-table" id="opsTable">
+            <thead>
+              <tr><th>ID</th><th>Operasyon Adı</th><th>Kullanım Sayısı</th></tr>
+            </thead>
+            <tbody id="opsBody">
+              <tr><td colspan="3" class="empty">Yükleniyor…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- MANUEL ---------- -->
+    <section class="view-panel hidden" id="panel-manuel">
+      <h1 class="page-title">Manuel Kayıt Girişi</h1>
+
+      <div class="card form-card">
+        <h2 class="card-title">Yeni İşlem Başlat</h2>
+        <form id="logForm">
+          <div class="form-row">
+            <label for="users_name">Operatör Adı</label>
+            <input type="text" id="users_name" name="users_name" required placeholder="Örn. Ahmet Mehmet">
+          </div>
+          <div class="form-row">
+            <label for="operation_name">Operasyon</label>
+            <input type="text" id="operation_name" name="operation_name" required placeholder="Örn. Lazer Kesim">
+          </div>
+          <div class="form-row">
+            <label for="cut_measurement">Kesim Ölçüsü (mm)</label>
+            <input type="number" step="0.01" id="cut_measurement" name="cut_measurement" required placeholder="0.00">
+          </div>
+          <button type="submit" class="btn-primary">Kaydı Başlat</button>
+          <p class="form-msg" id="logMsg"></p>
+        </form>
+      </div>
+    </section>
+
+    <!-- ---------- HATALAR ---------- -->
+    <section class="view-panel hidden" id="panel-hatalar">
+      <h1 class="page-title">Hatalar</h1>
+
+      <div class="card form-card">
+        <h2 class="card-title">Yeni Hata Kaydı</h2>
+        <form id="errorForm">
+          <div class="form-row">
+            <label for="err_log_id">İlgili Log</label>
+            <select id="err_log_id" name="log_id" required>
+              <option value="">Yükleniyor…</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label for="err_code">Hata Kodu</label>
+            <input type="text" id="err_code" name="error_code" required placeholder="Örn. E-204">
+          </div>
+          <div class="form-row">
+            <label for="err_message">Hata Mesajı</label>
+            <input type="text" id="err_message" name="error_message" required placeholder="Örn. Nozul tıkanması">
+          </div>
+          <div class="form-row">
+            <label for="err_severity">Önem Derecesi</label>
+            <select id="err_severity" name="severity">
+              <option value="LOW">LOW</option>
+              <option value="MEDIUM" selected>MEDIUM</option>
+              <option value="HIGH">HIGH</option>
+            </select>
+          </div>
+          <button type="submit" class="btn-primary">Hata Kaydı Ekle</button>
+          <p class="form-msg" id="errMsg"></p>
+        </form>
+      </div>
+
+      <h2 class="section-title">Tüm Hatalar (machine_errors)</h2>
+      <div class="table-wrap">
+        <table class="logs-table">
+          <thead>
+            <tr><th>ID</th><th>Log</th><th>Kod</th><th>Mesaj</th><th>Önem</th><th>Zaman</th></tr>
+          </thead>
+          <tbody id="errorsFullBody">
+            <tr><td colspan="6" class="empty">Yükleniyor…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ---------- KULLANICILAR ---------- -->
+    <section class="view-panel hidden" id="panel-kullanicilar">
+      <h1 class="page-title">Kullanıcılar</h1>
+      <div class="card">
+        <h2 class="card-title">Operatörler (users)</h2>
+        <div class="table-wrap">
+          <table class="logs-table">
+            <thead>
+              <tr><th>#</th><th>Operatör Adı</th><th>Toplam Kayıt</th><th>Toplam Mesafe</th></tr>
+            </thead>
+            <tbody id="usersBody">
+              <tr><td colspan="4" class="empty">Yükleniyor…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- SETTINGS ---------- -->
+    <section class="view-panel hidden" id="panel-settings">
+      <h1 class="page-title">Settings</h1>
+      <div class="card">
+        <h2 class="card-title">Bağlantı Durumu</h2>
+        <div class="status-row">
+          <span class="field-label">API Sunucu</span>
+          <span class="conn" id="connStatusSettings">● kontrol ediliyor</span>
+        </div>
+        <button class="btn-primary" id="refreshLogs" style="margin-top:16px;">Kayıtları Yenile</button>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ============ BOTTOM EVENT LOG STRIP ============ -->
+<button class="event-bar" id="eventBarToggle">
+  <span class="event-bell">🔔</span>
+  <span>SİSTEM OLAY GÜNLÜĞÜ</span>
+  <span class="event-count" id="errorCount">0</span>
+</button>
+
+<div class="event-drawer hidden" id="eventDrawer">
+  <div class="event-drawer-head">
+    <span>Son Hatalar (machine_errors)</span>
+    <button id="eventDrawerClose">✕</button>
+  </div>
+  <div class="table-wrap">
+    <table class="logs-table">
+      <thead>
+        <tr><th>ID</th><th>Log</th><th>Kod</th><th>Mesaj</th><th>Önem</th><th>Zaman</th></tr>
+      </thead>
+      <tbody id="errorsBody">
+        <tr><td colspan="6" class="empty">Yükleniyor…</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

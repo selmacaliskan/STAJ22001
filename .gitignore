@@ -1,0 +1,14 @@
+# Hassas ve yapılandırma dosyaları
+config.php
+.env
+
+# IDE ve Editör klasörleri
+.vscode/
+.idea/
+
+# İşletim sistemi önbellek dosyaları
+Thumbs.db
+.DS_Store
+
+# Log veya geçici dosyalar
+*.log
